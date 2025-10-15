@@ -1,0 +1,36 @@
+TO-DO-LIST
+
+
+* Dashboard DONE
+
+-Buat Fitur Laporan
+
+-Buat ManajemenKategori.jsx
+Tampilkan daftar semua kategori dalam sebuah tabel.
+Buat fungsi "Edit" yang membuka modal/halaman baru untuk mengubah deskripsi.
+
+-Styling Halaman Form Tambah & Edit Inventaris
+
+-Styling Halaman Form Tambah & Edit Pengguna
+
+-Bangun Halaman Dasbor Interaktif
+
+- Notifikasi berhasil/gagal/ yang lain masih kuno
+
+
+= Log aktivitas kurang lebih detail
+
+= Halaman log belum memiliki filter yang lengkap
+
+= Cek tombol yang seharusnya di tempatnya (data aktif, tidak aktif)
+
+=
+
+
+
+Revisi 10/15/2025
+
+=== Pembuatan User Guide Untuk Pendaftaaran HKI 
+=== Pembuatan perbandinggan by data menggunakan Virtual Box menggunakan DaietPi
+=== DaietPi digunakan ebagai server dan mengakses nya menggunakan windows 11
+=== 
