@@ -24,8 +24,8 @@ import {
 } from "lucide-react";
 
 // Komponen Kartu Statistik dengan desain modern pastel
-const StatCard = ({ title, value, icon: Icon, color, format = (v) => v }) => (
-  <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100/60 transition-all duration-300 hover:shadow-lg hover:border-blue-200 group">
+const StatCard = ({ title, value, icon: Icon, format = (v) => v }) => (
+  <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-sm border border-blue-100/60 transition-all duration-300 hover:shadow-lg hover:border-blue-200 group">
     <div className="flex justify-between items-start">
       <div className="flex-1">
         <p className="text-sm font-medium text-slate-600 mb-2">{title}</p>
@@ -33,10 +33,11 @@ const StatCard = ({ title, value, icon: Icon, color, format = (v) => v }) => (
           {format(value)}
         </p>
       </div>
-      <div
-        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 ml-4`}
-      >
-        <Icon size={20} className="text-white" />
+      <div className="w-12 h-12 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300 ml-4">
+        <Icon
+          size={22}
+          className="text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+        />
       </div>
     </div>
   </div>
@@ -119,9 +120,9 @@ export default function Dashboard() {
       <div className="max-w-[1600px] mx-auto space-y-6 lg:space-y-8">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto bg-gradient-to-br from-blue-200 to-cyan-200  rounded-2xl shadow-md overflow-hidden mt-2 mb-6">
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-xl font-bold text-slate-800 tracking-tight">
+              <h1 className="text-xl font-bold text-slate-700 tracking-tight">
                 Dashboard Inventaris
               </h1>
               <p className="text-slate-500 mt-2 text-sm lg:text-base flex items-center gap-2">
@@ -171,8 +172,11 @@ export default function Dashboard() {
           {/* Distribusi Status */}
           <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
-                <TrendingUp size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
+                <TrendingUp
+                  size={20}
+                  className="text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+                />
               </div>
               <h3 className="text-lg lg:text-xl font-bold text-slate-800">
                 Distribusi Status Aset
@@ -216,8 +220,11 @@ export default function Dashboard() {
           {/* Distribusi Kondisi */}
           <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow-md">
-                <TrendingUp size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
+                <TrendingUp
+                  size={20}
+                  className="text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+                />
               </div>
               <h3 className="text-lg lg:text-xl font-bold text-slate-800">
                 Distribusi Kondisi Aset
@@ -264,8 +271,11 @@ export default function Dashboard() {
           {/* Bar Chart Kategori */}
           <div className="lg:col-span-3 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center shadow-md">
-                <Activity size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
+                <Activity
+                  size={20}
+                  className="text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+                />
               </div>
               <h3 className="text-lg lg:text-xl font-bold text-slate-800">
                 Aset per Kategori
@@ -320,8 +330,11 @@ export default function Dashboard() {
           {/* Log Aktivitas */}
           <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center shadow-md">
-                <History size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
+                <History
+                  size={20}
+                  className="text-blue-500 group-hover:text-blue-600 transition-colors duration-300"
+                />
               </div>
               <h3 className="text-lg lg:text-xl font-bold text-slate-800">
                 Aktivitas Terbaru

@@ -154,11 +154,11 @@ export default function PersetujuanHapus() {
 
   return (
     <>
-      <div className="bg-slate-50 min-h-screen p-4">
+      <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6">
-            <h1 className="text-xl font-bold text-slate-800">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden p-4 mt-2 mb-6">
+            <h1 className="text-xl font-bold text-slate-700 tracking-tight">
               Persetujuan Penghapusan Aset
             </h1>
             <p className="text-sm text-slate-500 mt-1">
@@ -168,7 +168,7 @@ export default function PersetujuanHapus() {
           </div>
 
           {/* Tabel Daftar Pengajuan */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
             <div className="overflow-x-auto">
               {loading ? (
                 <TableLoader />
@@ -183,7 +183,7 @@ export default function PersetujuanHapus() {
                 </div>
               ) : (
                 <table className="min-w-full divide-y divide-slate-100">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-sky-50 border-y border-blue-100">
                     <tr>
                       <th className="p-4 text-left text-xs font-semibold text-slate-600 uppercase">
                         Nama Aset

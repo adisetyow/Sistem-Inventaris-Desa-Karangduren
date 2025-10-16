@@ -17,19 +17,14 @@ import {
 
 // --- Komponen-komponen UI Lokal untuk Form ---
 
-const FormSection = ({ title, subtitle, icon: Icon, children }) => (
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden transition-all duration-300 hover:shadow-xl">
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 border-b border-slate-200/60">
+const FormSection = ({ title, subtitle, children }) => (
+  <div className="bg-white rounded-lg shadow-lg border border-slate-200/60 overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div className="bg-sky-50 p-1 border-b border-slate-200/60">
       <div className="flex items-center gap-3">
-        {Icon && (
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
-            <Icon className="text-white" size={20} />
-          </div>
-        )}
         <div>
-          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+          <h1 className="px-4 text-lg font-semibold text-slate-800">{title}</h1>
           {subtitle && (
-            <p className="text-xs text-slate-600 mt-0.5">{subtitle}</p>
+            <p className="px-4 text-xs text-slate-600 mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>
@@ -308,17 +303,14 @@ export default function InventarisForm() {
     <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
       <form onSubmit={handleSubmit} className="max-w-5xl mx-auto space-y-6">
         {/* Header dengan Gradient Background */}
-        <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden mt-2 mb-6">
-          <div className="p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md border border-slate-100 overflow-hidden mt-2 mb-6">
+          <div className="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-                <Package className="text-blue-600" size={24} />
-              </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800">
+                <h1 className="text-xl font-bold text-slate-700 tracking-tight">
                   {isEditMode ? "Edit Inventaris" : "Tambah Inventaris Baru"}
                 </h1>
-                <p className="text-sm text-slate-500 mt-0.5">
+                <p className="text-sm text-slate-500 mt-1">
                   {isEditMode
                     ? formData.nama_barang
                     : "Lengkapi formulir untuk menambah aset baru"}

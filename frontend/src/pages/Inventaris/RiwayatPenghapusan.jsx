@@ -7,6 +7,7 @@ export default function RiwayatPenghapusan() {
       pageTitle="Riwayat Penghapusan Aset"
       apiEndpoint="/inventaris/riwayat-penghapusan"
       isHistoryPage={true}
+      description="Catatan aset desa yang telah dihapus dari sistem inventaris."
     />
   );
 }

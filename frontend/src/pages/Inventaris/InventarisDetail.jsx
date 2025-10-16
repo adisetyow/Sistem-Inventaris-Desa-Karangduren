@@ -20,6 +20,7 @@ import {
   Download,
   Upload,
   Eye,
+  Package,
 } from "lucide-react";
 
 const KondisiBadge = ({ kondisi }) => {
@@ -77,12 +78,14 @@ const DetailItem = ({ label, value, children }) => (
 );
 
 const HighlightItem = ({ icon, label, children }) => (
-  <div className="flex flex-col gap-1">
-    <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-      {icon}
-      {label}
+  <div className="bg-white/60 border border-slate-200/80 rounded-xl p-4 md:p-5 flex flex-col gap-1 shadow-sm hover:shadow-md hover:border-slate-300 hover:bg-white transition-all duration-200">
+    <div className="text-sm font-medium text-slate-600 flex items-center gap-2.5 mb-1">
+      <div className="p-1.5 bg-sky-100 rounded-md">{icon}</div>
+      <span>{label}</span>
     </div>
-    <div className="text-lg font-bold text-slate-800">{children}</div>
+    <div className="text-base font-semibold text-slate-800 tracking-tight pl-10">
+      {children}
+    </div>
   </div>
 );
 
@@ -394,251 +397,285 @@ export default function InventarisDetail() {
   return (
     <>
       <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
-        <div className="max-w-4xl mx-auto">
-          {/* --- KARTU HEADER (NAVIGASI & EDIT) --- */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-6">
-            <div className="p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        {/* --- KARTU HEADER (NAVIGASI & EDIT) --- */}
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md border border-slate-100 overflow-hidden mt-2 mb-6">
+          <div className="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h1 className="text-xl font-bold text-slate-700 tracking-tight">
+                Detail Item Inventaris
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                Informasi lengkap mengenai aset inventaris desa.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              <Link
+                to={-1}
+                className="px-3 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-slate-200"
+              >
+                <ArrowLeft className="w-4 h-4" /> Kembali
+              </Link>
+              {canPerformActions &&
+                !inventaris.deleted_at &&
+                inventaris.status === "aktif" && (
+                  <Link
+                    to={`/inventaris/edit/${id}`}
+                    className="px-3 py-2 text-sm font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-blue-200"
+                  >
+                    <Edit className="w-4 h-4" /> Edit Data
+                  </Link>
+                )}
+            </div>
+          </div>
+        </div>
+
+        {/* --- PANEL SOROTAN (HIGHLIGHT) --- */}
+        <div className="max-w-7xl mx-auto mb-6">
+          {/* Panel Terpadu */}
+          <div className="bg-sky-50 border border-sky-200/80 rounded-xl shadow-sm p-5 md:p-6">
+            {/* --- Highlight Utama (Nama & Kode) --- */}
+            <div className="pb-4 border-b border-sky-200">
+              <h4 className="text-sm md:text-2xl font-semibold text-slate-800 tracking-tight">
+                {inventaris.nama_barang}
+              </h4>
+              <p className="text-sm font-medium text-blue-600 mt-1">
+                {inventaris.kode_inventaris}
+              </p>
+            </div>
+
+            {/* --- Detail Sekunder --- */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-5 pt-5">
+              {/* Status */}
               <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-                  {inventaris.nama_barang}
-                </h1>
-                <p className="text-sm font-semibold text-blue-600 mt-1">
-                  {inventaris.kode_inventaris}
-                </p>
+                <div className="text-sm font-medium text-slate-600 flex items-center gap-2 mb-1">
+                  <ShieldCheck className="w-4 h-4 text-sky-700" />
+                  <span>Status</span>
+                </div>
+                <div className="text-base font-semibold text-slate-800">
+                  <StatusBadge
+                    status={
+                      inventaris.deleted_at ? "dihapus" : inventaris.status
+                    }
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-2 self-start sm:self-center">
-                <Link
-                  to={-1}
-                  className="px-3 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-slate-200"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Kembali
-                </Link>
-                {canPerformActions &&
-                  !inventaris.deleted_at &&
-                  inventaris.status === "aktif" && (
-                    <Link
-                      to={`/inventaris/edit/${id}`}
-                      className="px-3 py-2 text-sm font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-blue-200"
-                    >
-                      <Edit className="w-4 h-4" /> Edit Data
-                    </Link>
-                  )}
+
+              {/* Kondisi */}
+              <div>
+                <div className="text-sm font-medium text-slate-600 flex items-center gap-2 mb-1">
+                  <Info className="w-4 h-4 text-sky-700" />
+                  <span>Kondisi</span>
+                </div>
+                <div className="text-base font-semibold text-slate-800">
+                  <KondisiBadge kondisi={inventaris.kondisi} />
+                </div>
+              </div>
+
+              {/* Kategori */}
+              <div>
+                <div className="text-sm font-medium text-slate-600 flex items-center gap-2 mb-1">
+                  <Tag className="w-4 h-4 text-sky-700" />
+                  <span>Kategori</span>
+                </div>
+                <div className="text-base font-semibold text-slate-800">
+                  {inventaris.kategori?.nama_kategori || "-"}
+                </div>
+              </div>
+
+              {/* Total Nilai */}
+              <div>
+                <div className="text-sm font-medium text-slate-600 flex items-center gap-2 mb-1">
+                  <DollarSign className="w-4 h-4 text-sky-700" />
+                  <span>Total Nilai</span>
+                </div>
+                <div className="text-base font-semibold text-slate-800">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  }).format(inventaris.total_harga)}
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* --- PANEL SOROTAN (HIGHLIGHT) --- */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <HighlightItem
-              icon={<ShieldCheck className="w-4 h-4 text-slate-500" />}
-              label="Status"
-            >
-              <StatusBadge
-                status={inventaris.deleted_at ? "dihapus" : inventaris.status}
-              />
-            </HighlightItem>
-            <HighlightItem
-              icon={<Info className="w-4 h-4 text-slate-500" />}
-              label="Kondisi"
-            >
-              <KondisiBadge kondisi={inventaris.kondisi} />
-            </HighlightItem>
-            <HighlightItem
-              icon={<Tag className="w-4 h-4 text-slate-500" />}
-              label="Kategori"
-            >
-              {inventaris.kategori?.nama_kategori}
-            </HighlightItem>
-            <HighlightItem
-              icon={<DollarSign className="w-4 h-4 text-slate-500" />}
-              label="Total Nilai"
-            >
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(inventaris.total_harga)}
-            </HighlightItem>
-          </div>
-
-          {/* --- KARTU RIWAYAT PENGHAPUSAN --- */}
-          {inventaris.deleted_at && inventaris.riwayat_penghapusan && (
-            <SectionCard
-              title="Riwayat Penghapusan Aset"
-              icon={<Trash2 className="w-5 h-5 text-rose-500" />}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
-                <div>
-                  <DetailItem
-                    label="Tanggal Dihapus"
-                    value={new Date(inventaris.deleted_at).toLocaleDateString(
-                      "id-ID",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  />
-                  <DetailItem label="Diajukan Oleh">
-                    {inventaris.riwayat_penghapusan.admin ? (
-                      <span>
-                        {inventaris.riwayat_penghapusan.admin.name}
-                        <span className="text-slate-500 italic">
-                          {" ("}
-                          {inventaris.riwayat_penghapusan.admin.roles[0]?.name.replace(
-                            "-",
-                            " "
-                          )}
-                          )
-                        </span>
-                      </span>
-                    ) : (
-                      "N/A"
-                    )}
-                  </DetailItem>
-                  <DetailItem label="Disetujui Oleh">
-                    {inventaris.riwayat_penghapusan.superadmin ? (
-                      <span>
-                        {inventaris.riwayat_penghapusan.superadmin.name}
-                        <span className="text-slate-500 italic">
-                          {" ("}
-                          {inventaris.riwayat_penghapusan.superadmin.roles[0]?.name.replace(
-                            "-",
-                            " "
-                          )}
-                          )
-                        </span>
-                      </span>
-                    ) : (
-                      "N/A"
-                    )}
-                  </DetailItem>
-                </div>
-                <div>
-                  <DetailItem label="Alasan Penghapusan">
-                    <TruncatedText
-                      text={inventaris.riwayat_penghapusan.alasan_penghapusan}
-                    />
-                  </DetailItem>
-                  <DetailItem label="Berita Acara">
-                    <button
-                      onClick={() =>
-                        handleLihatBukti(
-                          inventaris.riwayat_penghapusan.berita_acara_path
-                        )
-                      }
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline"
-                    >
-                      <Eye className="w-4 h-4" /> Lihat Dokumen
-                    </button>
-                  </DetailItem>
-                </div>
-              </div>
-            </SectionCard>
-          )}
-
-          {/* --- KARTU INFO NONAKTIF --- */}
-          {inventaris?.status === "tidak_aktif" &&
-            inventaris.log_status_terakhir && (
-              <InfoNonaktif
-                log={inventaris.log_status_terakhir}
-                onLihatBukti={handleLihatBukti}
-              />
-            )}
-
-          {/* --- KARTU INFORMASI UMUM & FINANSIAL --- */}
+        {/* --- KARTU RIWAYAT PENGHAPUSAN --- */}
+        {inventaris.deleted_at && inventaris.riwayat_penghapusan && (
           <SectionCard
-            title="Informasi Umum & Finansial"
-            icon={<Info className="w-5 h-5 text-slate-500" />}
+            title="Riwayat Penghapusan Aset"
+            icon={<Trash2 className="w-5 h-5 text-rose-500" />}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
               <div>
-                <DetailItem label="Jumlah" value={inventaris.jumlah} />
                 <DetailItem
-                  label="Lokasi Penempatan"
-                  value={inventaris.lokasi_penempatan}
-                />
-                <DetailItem
-                  label="Tanggal Masuk"
-                  value={new Date(inventaris.tanggal_masuk).toLocaleDateString(
+                  label="Tanggal Dihapus"
+                  value={new Date(inventaris.deleted_at).toLocaleDateString(
                     "id-ID",
-                    { year: "numeric", month: "long", day: "numeric" }
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
                   )}
                 />
+                <DetailItem label="Diajukan Oleh">
+                  {inventaris.riwayat_penghapusan.admin ? (
+                    <span>
+                      {inventaris.riwayat_penghapusan.admin.name}
+                      <span className="text-slate-500 italic">
+                        {" ("}
+                        {inventaris.riwayat_penghapusan.admin.roles[0]?.name.replace(
+                          "-",
+                          " "
+                        )}
+                        )
+                      </span>
+                    </span>
+                  ) : (
+                    "N/A"
+                  )}
+                </DetailItem>
+                <DetailItem label="Disetujui Oleh">
+                  {inventaris.riwayat_penghapusan.superadmin ? (
+                    <span>
+                      {inventaris.riwayat_penghapusan.superadmin.name}
+                      <span className="text-slate-500 italic">
+                        {" ("}
+                        {inventaris.riwayat_penghapusan.superadmin.roles[0]?.name.replace(
+                          "-",
+                          " "
+                        )}
+                        )
+                      </span>
+                    </span>
+                  ) : (
+                    "N/A"
+                  )}
+                </DetailItem>
               </div>
               <div>
-                <DetailItem
-                  label="Sumber Dana"
-                  value={inventaris.sumber_dana}
-                />
-                <DetailItem
-                  label="Harga Satuan"
-                  value={new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  }).format(inventaris.harga_perolehan)}
-                />
-                <DetailItem label="Catatan" value={inventaris.catatan} />
+                <DetailItem label="Alasan Penghapusan">
+                  <TruncatedText
+                    text={inventaris.riwayat_penghapusan.alasan_penghapusan}
+                  />
+                </DetailItem>
+                <DetailItem label="Berita Acara">
+                  <button
+                    onClick={() =>
+                      handleLihatBukti(
+                        inventaris.riwayat_penghapusan.berita_acara_path
+                      )
+                    }
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline"
+                  >
+                    <Eye className="w-4 h-4" /> Lihat Dokumen
+                  </button>
+                </DetailItem>
               </div>
             </div>
           </SectionCard>
+        )}
 
-          {/* --- KARTU DETAIL SPESIFIK ASET --- */}
-          {specificDetails.length > 0 && (
-            <SectionCard
-              title="Detail Spesifik Aset"
-              icon={<FileText className="w-5 h-5 text-slate-500" />}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
-                {specificDetails.map((detail) => (
-                  <DetailItem
-                    key={detail.label}
-                    label={detail.label}
-                    value={detail.value}
-                  />
-                ))}
-              </div>
-            </SectionCard>
+        {/* --- KARTU INFO NONAKTIF --- */}
+        {inventaris?.status === "tidak_aktif" &&
+          inventaris.log_status_terakhir && (
+            <InfoNonaktif
+              log={inventaris.log_status_terakhir}
+              onLihatBukti={handleLihatBukti}
+            />
           )}
 
-          {/* --- ZONA AKSI (DANGER ZONE) --- */}
-          {canPerformActions &&
-            !inventaris.deleted_at &&
-            (inventaris.status === "aktif" ||
-              inventaris.status === "tidak_aktif") && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 mt-8 p-5">
-                <h3 className="text-base font-bold text-slate-800 tracking-tight mb-4">
-                  Aksi Lanjutan
-                </h3>
-                <div className="flex items-center gap-3 flex-wrap">
-                  {inventaris.status === "aktif" && (
-                    <>
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-3 py-2 text-sm font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-amber-200"
-                      >
-                        <Power className="w-4 h-4" /> Nonaktifkan
-                      </button>
-                      <Link
-                        to={`/inventaris/penghapusan/${id}`}
-                        className="px-3 py-2 text-sm font-semibold text-rose-800 bg-rose-100 hover:bg-rose-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-rose-200"
-                      >
-                        <Trash2 className="w-4 h-4" /> Ajukan Hapus
-                      </Link>
-                    </>
-                  )}
-                  {inventaris.status === "tidak_aktif" && (
+        {/* --- KARTU INFORMASI UMUM & FINANSIAL --- */}
+        <SectionCard
+          title="Informasi Umum & Finansial"
+          icon={<Info className="w-5 h-5 text-slate-500" />}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
+            <div>
+              <DetailItem label="Jumlah" value={inventaris.jumlah} />
+              <DetailItem
+                label="Lokasi Penempatan"
+                value={inventaris.lokasi_penempatan}
+              />
+              <DetailItem
+                label="Tanggal Masuk"
+                value={new Date(inventaris.tanggal_masuk).toLocaleDateString(
+                  "id-ID",
+                  { year: "numeric", month: "long", day: "numeric" }
+                )}
+              />
+            </div>
+            <div>
+              <DetailItem label="Sumber Dana" value={inventaris.sumber_dana} />
+              <DetailItem
+                label="Harga Satuan"
+                value={new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(inventaris.harga_perolehan)}
+              />
+              <DetailItem label="Catatan" value={inventaris.catatan} />
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* --- KARTU DETAIL SPESIFIK ASET --- */}
+        {specificDetails.length > 0 && (
+          <SectionCard
+            title="Detail Spesifik Aset"
+            icon={<FileText className="w-5 h-5 text-slate-500" />}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-8">
+              {specificDetails.map((detail) => (
+                <DetailItem
+                  key={detail.label}
+                  label={detail.label}
+                  value={detail.value}
+                />
+              ))}
+            </div>
+          </SectionCard>
+        )}
+
+        {/* --- ZONA AKSI (DANGER ZONE) --- */}
+        {canPerformActions &&
+          !inventaris.deleted_at &&
+          (inventaris.status === "aktif" ||
+            inventaris.status === "tidak_aktif") && (
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 mt-8 p-5">
+              <h3 className="text-base font-bold text-slate-800 tracking-tight mb-4">
+                Aksi Lanjutan
+              </h3>
+              <div className="flex items-center gap-3 flex-wrap">
+                {inventaris.status === "aktif" && (
+                  <>
                     <button
-                      onClick={handleAktifkan}
-                      className="px-3 py-2 text-sm font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-emerald-200"
+                      onClick={() => setIsModalOpen(true)}
+                      className="px-3 py-2 text-sm font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-amber-200"
                     >
-                      <Power className="w-4 h-4" /> Aktifkan Kembali
+                      <Power className="w-4 h-4" /> Nonaktifkan
                     </button>
-                  )}
-                </div>
+                    <Link
+                      to={`/inventaris/penghapusan/${id}`}
+                      className="px-3 py-2 text-sm font-semibold text-rose-800 bg-rose-100 hover:bg-rose-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-rose-200"
+                    >
+                      <Trash2 className="w-4 h-4" /> Ajukan Hapus
+                    </Link>
+                  </>
+                )}
+                {inventaris.status === "tidak_aktif" && (
+                  <button
+                    onClick={handleAktifkan}
+                    className="px-3 py-2 text-sm font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-emerald-200"
+                  >
+                    <Power className="w-4 h-4" /> Aktifkan Kembali
+                  </button>
+                )}
               </div>
-            )}
-        </div>
+            </div>
+          )}
       </div>
 
       {/* --- MODAL UNTUK KONFIRMASI NONAKTIFKAN --- */}

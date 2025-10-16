@@ -7,6 +7,7 @@ export default function InventarisAktif() {
       pageTitle="Data Inventaris Aktif"
       apiEndpoint="/inventaris"
       statusFilter="aktif"
+      description="Daftar aset desa yang masih aktif dan digunakan dalam operasional."
     />
   );
 }

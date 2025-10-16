@@ -168,6 +168,7 @@ const PaginationControls = ({ paginationInfo, onPageChange }) => {
 
 export default function InventarisLayout({
   pageTitle,
+  description,
   apiEndpoint,
   statusFilter = null,
   isHistoryPage = false,
@@ -313,27 +314,28 @@ export default function InventarisLayout({
     <>
       <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
         {/* Header Section */}
-        <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden mt-2 mb-6">
-          <div className="p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md border border-slate-100 overflow-hidden mt-2 mb-6">
+          <div className="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-xl font-bold text-slate-800 tracking-tight">
+              <h1 className="text-xl font-bold text-slate-700 tracking-tight">
                 {pageTitle}
               </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Kelola dan pantau seluruh aset inventaris desa.
-              </p>
+              <p className="text-sm text-slate-500 mt-1">{description}</p>
             </div>
             {!isHistoryPage && (
               <Link to="/inventaris/tambah" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto bg-blue-500 hover:bg-sky-600 text-white font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center justify-center gap-2 text-sm transition-all duration-200 ease-in-out hover:shadow-md focus:ring-4 focus:ring-sky-200">
+                <button className="px-3 py-2 text-sm font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-blue-200">
                   <Plus className="w-4 h-4" />
                   Tambah
                 </button>
               </Link>
             )}
           </div>
+        </div>
 
-          <div className="border-t border-slate-200 p-5">
+        {/* Search dll */}
+        <div className="w-full mx-auto bg-white rounded-xl shadow-sm border border-slate-100 overflow-x-hidden">
+          <div className="border-t border-slate-200 p-3">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-2 w-full md:w-auto">
                 <label
@@ -394,7 +396,7 @@ export default function InventarisLayout({
             leaveFrom="opacity-100 max-h-96"
             leaveTo="opacity-0 max-h-0"
           >
-            <div className="p-5 border-t border-slate-100 bg-slate-50/50 overflow-hidden">
+            <div className="p-2 border-t border-slate-100 bg-slate-50/50 overflow-hidden">
               <FilterPanel
                 filters={filters}
                 setFilters={setFilters}
@@ -403,10 +405,8 @@ export default function InventarisLayout({
               />
             </div>
           </Transition>
-        </div>
 
-        {/* Daftar Inventaris */}
-        <div className="w-full mx-auto bg-white rounded-xl shadow-sm border border-slate-100 overflow-x-hidden">
+          {/* Daftar Inventaris */}
           <div className="overflow-x-auto lg:overflow-x-visible">
             {loading ? (
               <div className="p-8">
@@ -428,23 +428,23 @@ export default function InventarisLayout({
               // Tabel Inventaris
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-100">
-                  <thead className="bg-white border-y border-slate-300">
+                  <thead className="bg-sky-50 border-y border-blue-100">
                     <tr>
                       <th
-                        className="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
+                        className="px-2 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
                         style={{ width: "60px" }}
                       >
                         No.
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
+                        className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
                         style={{ width: "140px" }}
                       >
                         Kode
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase"
-                        style={{ minWidth: "200px", width: "30%" }}
+                        className="px-2 py-3 text-left text-xs font-bold text-slate-700 uppercase"
+                        style={{ minWidth: "200px", width: "5%" }}
                       >
                         Nama Barang
                       </th>
@@ -452,58 +452,62 @@ export default function InventarisLayout({
                       {statusFilter === "tidak_aktif" ? (
                         <>
                           <th
-                            className="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
+                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
                             style={{ width: "100px" }}
                           >
                             Bukti
                           </th>
                           <th
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase"
-                            style={{ minWidth: "180px", width: "25%" }}
+                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase"
+                            style={{ minWidth: "180px", width: "15%" }}
                           >
                             Keterangan
                           </th>
                         </>
                       ) : isHistoryPage ? (
                         <>
+                          {/* Lebar Kategori disamakan */}
                           <th
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase"
+                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase"
                             style={{ width: "150px" }}
                           >
                             Kategori
                           </th>
                           <th
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
-                            style={{ width: "130px" }}
+                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
+                            style={{ width: "140px" }}
                           >
                             Tgl Dihapus
                           </th>
                         </>
                       ) : (
                         <>
+                          {/* Lebar Kategori disamakan */}
                           <th
-                            className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase"
+                            className="px-1 py-3 text-left text-xs font-bold text-slate-700 uppercase"
                             style={{ width: "150px" }}
                           >
                             Kategori
                           </th>
+                          {/* Lebar Kondisi ditambah agar tidak terpotong */}
                           <th
-                            className="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
-                            style={{ width: "100px" }}
+                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
+                            style={{ width: "170px" }}
                           >
                             Kondisi
                           </th>
                         </>
                       )}
 
+                      {/* Lebar Total Nilai ditambah */}
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
-                        style={{ width: "160px" }}
+                        className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
+                        style={{ width: "180px" }}
                       >
                         Total Nilai
                       </th>
                       <th
-                        className="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase whitespace-nowrap"
+                        className="px-3 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
                         style={{ width: "100px" }}
                       >
                         Aksi
@@ -516,7 +520,7 @@ export default function InventarisLayout({
                         key={item.id}
                         className="hover:bg-slate-50/70 transition-colors duration-150"
                       >
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3">
                           <span className="text-sm font-medium text-slate-600">
                             {paginationInfo.from + index}
                           </span>
@@ -526,7 +530,7 @@ export default function InventarisLayout({
                             {item.kode_inventaris}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3">
                           <span
                             className="text-sm font-medium text-slate-800 truncate max-w-[200px] block"
                             title={item.nama_barang}
@@ -537,7 +541,8 @@ export default function InventarisLayout({
 
                         {statusFilter === "tidak_aktif" ? (
                           <>
-                            <td className="px-3 py-3">
+                            {/* Padding disamakan menjadi px-4 */}
+                            <td className="px-4 py-3">
                               {item.log_status_terakhir?.file_pendukung_path ? (
                                 <button
                                   onClick={() =>
@@ -567,6 +572,7 @@ export default function InventarisLayout({
                           </>
                         ) : isHistoryPage ? (
                           <>
+                            {/* Padding disamakan menjadi px-4 */}
                             <td className="px-4 py-3">
                               <span className="text-sm truncate block">
                                 {item.kategori?.nama_kategori || "-"}
@@ -582,12 +588,13 @@ export default function InventarisLayout({
                           </>
                         ) : (
                           <>
-                            <td className="px-4 py-3">
+                            {/* Padding disamakan menjadi px-4 */}
+                            <td className="px-1 py-3">
                               <span className="text-sm truncate block">
                                 {item.kategori?.nama_kategori || "-"}
                               </span>
                             </td>
-                            <td className="px-3 py-3">
+                            <td className="px-4 py-3">
                               <KondisiBadge kondisi={item.kondisi} />
                             </td>
                           </>
@@ -612,38 +619,36 @@ export default function InventarisLayout({
 
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-2">
-                            {/* Tombol Detail selalu ada di semua halaman */}
+                            {/* Tombol Detail */}
                             <Link
                               to={`/inventaris/${item.id}`}
                               title="Detail"
-                              className="p-1.5 rounded-md hover:bg-slate-100"
+                              className="p-2 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 hover:bg-sky-100 hover:border-sky-200 hover:text-sky-700 shadow-sm transition-all duration-200"
                             >
-                              <Eye className="w-5 h-5 text-slate-500 hover:text-blue-600" />
+                              <Eye className="w-4 h-4" />
                             </Link>
 
-                            {/* Tampilkan Tombol Edit HANYA di halaman Aktif */}
+                            {/* Tombol Edit (hanya di halaman Aktif) */}
                             {statusFilter === "aktif" && (
                               <Link
                                 to={`/inventaris/edit/${item.id}`}
                                 title="Edit"
-                                className="p-1.5 rounded-md hover:bg-slate-100"
+                                className="p-2 rounded-lg bg-green-50 border border-green-100 text-green-600 hover:bg-green-100 hover:border-green-200 hover:text-green-700 shadow-sm transition-all duration-200"
                               >
-                                <Pencil className="w-5 h-5 text-slate-500 hover:text-green-600" />
+                                <Pencil className="w-4 h-4" />
                               </Link>
                             )}
 
-                            {/* Tampilkan Tombol Aktifkan HANYA di halaman Tidak Aktif */}
+                            {/* Tombol Aktifkan (hanya di halaman Tidak Aktif) */}
                             {statusFilter === "tidak_aktif" && (
                               <button
                                 onClick={() => handleAktifkan(item.id)}
                                 title="Aktifkan Kembali"
-                                className="p-1.5 rounded-md hover:bg-slate-100"
+                                className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-200 hover:text-emerald-700 shadow-sm transition-all duration-200"
                               >
-                                <RotateCcw className="w-5 h-5 text-slate-500 hover:text-emerald-600" />
+                                <RotateCcw className="w-4 h-4" />
                               </button>
                             )}
-
-                            {/* Tidak ada tombol lain di halaman Riwayat Penghapusan */}
                           </div>
                         </td>
                       </tr>
