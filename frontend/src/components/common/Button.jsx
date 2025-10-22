@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Link } from "react-router-dom";
 
 const Button = ({
-  as = "button", // 'button' or 'Link'
+  as = "button",
   to,
   type = "button",
   children,

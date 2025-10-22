@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventaris;
 use App\Models\KategoriInventaris;
-use App\Models\LogAktivitas;
 use App\Models\LogStatusInventaris;
 use App\Services\AsetHandlerService;
 use App\Services\KodeInventarisService;

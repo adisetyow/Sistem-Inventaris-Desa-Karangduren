@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PenghapusanController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\LogAktivitasController;
+use App\Http\Controllers\LaporanController;
 
 
 // Rute Publik (Tidak perlu login)
@@ -55,6 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::get('/download', [FileController::class, 'downloadBukti']);
+    Route::get('/stream-file', [FileController::class, 'streamFile']);
+
+    Route::get('/laporan/inventaris', [LaporanController::class, 'getInventarisData']);
+    Route::post('/laporan/inventaris/pdf', [LaporanController::class, 'exportPdf']);
+    Route::post('/laporan/inventaris/csv', [LaporanController::class, 'exportCsv']);
 
     // Route::post('/inventaris/{inventaris}/set-tidak-aktif', [InventarisController::class, 'setTidakAktif'])->middleware('role:admin|super-admin');
 

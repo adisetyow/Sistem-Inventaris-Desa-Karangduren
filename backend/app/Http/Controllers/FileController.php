@@ -31,4 +31,23 @@ class FileController extends Controller
         // 4. Download file
         return response()->download(storage_path('app/public/' . $filePath));
     }
+
+    public function streamFile(Request $request)
+    {
+        $validated = $request->validate(['path' => 'required|string']);
+        $filePath = $validated['path'];
+
+        // Keamanan: Pastikan path hanya mengakses folder yang diizinkan
+        if (!Str::startsWith($filePath, ['file_pendukung_status/', 'berita_acara/'])) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        if (!Storage::disk('public')->exists($filePath)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        // Gunakan response()->file() untuk menampilkan file di browser (bukan download)
+        // Fungsi ini secara otomatis mengatur Content-Type yang benar (misal: image/jpeg)
+        return response()->file(storage_path('app/public/' . $filePath));
+    }
 }

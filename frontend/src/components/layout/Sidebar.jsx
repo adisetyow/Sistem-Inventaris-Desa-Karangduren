@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import axiosClient from "../../api/axiosClient";
 import Logo from "../../assets/images/logo.JPG";
 import { useState, useEffect } from "react";
-import { Home, Package, Users, CheckSquare, History } from "lucide-react";
+import { History, LineChart } from "lucide-react";
 
 const DashboardIcon = (
   <svg
@@ -261,6 +261,13 @@ export default function Sidebar({ isOpen, setIsOpen, isCollapsed }) {
                 Log Aktivitas
               </NavItem>
             )}
+            <NavItem
+              to="/laporan/inventaris"
+              icon={<LineChart />}
+              isCollapsed={isCollapsed}
+            >
+              Laporan
+            </NavItem>
           </ul>
         </nav>
       </aside>

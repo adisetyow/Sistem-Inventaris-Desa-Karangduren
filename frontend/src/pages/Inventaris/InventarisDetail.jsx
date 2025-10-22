@@ -20,8 +20,9 @@ import {
   Download,
   Upload,
   Eye,
-  Package,
+  Loader2,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const KondisiBadge = ({ kondisi }) => {
   const baseClasses =
@@ -209,7 +210,7 @@ const InfoNonaktif = ({ log, onLihatBukti }) => {
               {log.file_pendukung_path ? (
                 <button
                   onClick={() => onLihatBukti(log.file_pendukung_path)}
-                  className="text-sm text-blue-600 hover:underline font-semibold text-left break-words"
+                  className="text-sm text-blue-600 hover:underline font-semibold text-left"
                 >
                   Lihat Bukti
                 </button>
@@ -261,20 +262,16 @@ export default function InventarisDetail() {
   const [inventaris, setInventaris] = useState(null);
   const [loading, setLoading] = useState(true);
   const [specificDetails, setSpecificDetails] = useState([]);
-  // Cek hak akses
   const canPerformActions = user?.roles?.some(
     (role) => role.name === "admin" || role.name === "super-admin"
   );
-
-  //State Modal Konfirmasi
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [alasan, setAlasan] = useState("");
   const [filePendukung, setFilePendukung] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  //State Modal Bukti
   const [isBuktiModalOpen, setIsBuktiModalOpen] = useState(false);
-  const [selectedBukti, setSelectedBukti] = useState(null);
+  const [fileToView, setFileToView] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -306,12 +303,43 @@ export default function InventarisDetail() {
       });
   }, [id]);
 
-  const handleLihatBukti = (filePath) => {
+  const handleLihatBukti = async (filePath) => {
     if (!filePath) return;
     const fileName = filePath.split("/").pop();
-    const fileUrl = `${import.meta.env.VITE_API_URL}/storage/${filePath}`;
-    setSelectedBukti({ url: fileUrl, name: fileName, path: filePath });
+    const isPdf = fileName.toLowerCase().endsWith(".pdf");
+
+    setFileToView({
+      name: fileName,
+      path: filePath,
+      url: null,
+      loading: true,
+      isPdf: isPdf,
+    });
     setIsBuktiModalOpen(true);
+
+    try {
+      const response = await axiosClient.get("/stream-file", {
+        params: { path: filePath },
+        responseType: "blob",
+      });
+
+      let mimeType = "application/octet-stream";
+      if (isPdf) {
+        mimeType = "application/pdf";
+      } else if (fileName.toLowerCase().match(/\.(jpg|jpeg)$/)) {
+        mimeType = "image/jpeg";
+      } else if (fileName.toLowerCase().endsWith(".png")) {
+        mimeType = "image/png";
+      }
+
+      const blob = new Blob([response.data], { type: mimeType });
+      const blobUrl = window.URL.createObjectURL(blob);
+      setFileToView((prev) => ({ ...prev, url: blobUrl, loading: false }));
+    } catch (error) {
+      console.error("Error loading file:", error);
+      toast.error("Gagal memuat pratinjau file.");
+      setFileToView((prev) => ({ ...prev, loading: false, error: true }));
+    }
   };
 
   const handleDownloadBukti = async (path, filename) => {
@@ -337,9 +365,10 @@ export default function InventarisDetail() {
 
   const handleNonaktifkan = async () => {
     if (!alasan) {
-      alert("Alasan tidak boleh kosong.");
+      toast.error("Alasan tidak boleh kosong.");
       return;
     }
+
     setIsSubmitting(true);
 
     const formData = new FormData();
@@ -348,43 +377,57 @@ export default function InventarisDetail() {
       formData.append("file_pendukung", filePendukung);
     }
 
-    try {
-      const response = await axiosClient.post(
-        `/inventaris/${id}/set-tidak-aktif`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      alert(response.data.message);
-      setIsModalOpen(false);
-      navigate("/inventaris/aktif");
-    } catch (error) {
-      alert("Gagal menonaktifkan data.");
-      console.error(error);
-    } finally {
+    // Buat promise dari request API
+    const promise = axiosClient.post(
+      `/inventaris/${id}/set-tidak-aktif`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    // Tampilkan notifikasi progress, sukses, dan error
+    toast.promise(promise, {
+      loading: "Menonaktifkan aset...",
+      success: (res) => {
+        setIsModalOpen(false); // Tutup modal
+        setTimeout(() => navigate("/inventaris/aktif"), 1000); // Redirect ke halaman aktif
+        return res.data.message || "Aset berhasil dinonaktifkan!";
+      },
+      error: (err) => {
+        console.error("Gagal menonaktifkan:", err);
+        return "Gagal menonaktifkan data.";
+      },
+    });
+
+    // Pastikan tombol kembali aktif setelah proses selesai
+    promise.finally(() => {
       setIsSubmitting(false);
-    }
+    });
   };
 
   const handleAktifkan = () => {
     if (
       !window.confirm("Apakah Anda yakin ingin mengaktifkan kembali aset ini?")
-    )
+    ) {
       return;
+    }
 
-    axiosClient
-      .post(`/inventaris/${id}/set-aktif`, {
-        alasan: "Aset diaktifkan kembali",
-      })
-      .then((response) => {
-        alert(response.data.message);
-        navigate("/inventaris/tidak-aktif"); // Redirect ke halaman yang sesuai
-      })
-      .catch((error) => {
-        alert("Gagal mengaktifkan data.");
-        console.error(error);
-      });
+    const promise = axiosClient.post(`/inventaris/${id}/set-aktif`, {
+      alasan: "Aset diaktifkan kembali",
+    });
+
+    toast.promise(promise, {
+      loading: "Mengaktifkan aset...",
+      success: (res) => {
+        window.location.reload();
+        return res.data.message || "Aset berhasil diaktifkan!";
+      },
+      error: (err) => {
+        console.error("Gagal mengaktifkan aset:", err);
+        return "Gagal mengaktifkan data.";
+      },
+    });
   };
 
   if (loading) {
@@ -764,32 +807,38 @@ export default function InventarisDetail() {
         onClose={() => setIsBuktiModalOpen(false)}
         title="Lihat Bukti Pendukung"
       >
-        {selectedBukti && (
+        {fileToView && (
           <>
-            <div className="mt-4">
-              {selectedBukti.url.toLowerCase().endsWith(".pdf") ? (
-                <iframe
-                  src={selectedBukti.url}
-                  className="w-full h-[70vh] rounded-lg border"
-                  title="PDF Viewer"
-                ></iframe>
-              ) : (
-                <img
-                  src={selectedBukti.url}
-                  alt="Bukti Pendukung"
-                  className="max-w-full max-h-[70vh] mx-auto rounded-lg"
-                />
+            <div className="mt-4 min-h-[300px] flex items-center justify-center bg-slate-50 rounded-lg">
+              {fileToView.loading && (
+                <Loader2 className="animate-spin text-slate-400" size={32} />
               )}
+              {fileToView.error && (
+                <p className="text-rose-500">Gagal memuat pratinjau.</p>
+              )}
+              {fileToView.url &&
+                (fileToView.isPdf ? ( // Gunakan 'isPdf' dari state
+                  <embed // Gunakan <embed> untuk PDF
+                    src={fileToView.url}
+                    type="application/pdf"
+                    className="w-full h-[70vh] rounded-lg border"
+                  />
+                ) : (
+                  <img
+                    src={fileToView.url}
+                    alt="Bukti Pendukung"
+                    className="max-w-full max-h-[70vh] mx-auto rounded-lg"
+                  />
+                ))}
             </div>
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() =>
-                  handleDownloadBukti(selectedBukti.path, selectedBukti.name)
+                  handleDownloadBukti(fileToView.path, fileToView.name)
                 }
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm"
               >
-                <Download className="w-4 h-4" />
-                Download
+                <Download className="w-4 h-4" /> Download
               </button>
             </div>
           </>

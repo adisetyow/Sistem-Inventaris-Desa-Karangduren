@@ -1,30 +1,36 @@
 TO-DO-LIST
 
 
-* Dashboard DONE
+* Dashboard ----- DONE
+* Styling Halaman Form Tambah & Edit Inventaris ------ DONE
+* Bangun Halaman Dasbor Interaktif -----  DONE
+* Filter untuk range harga masih mencurigakan  ----- DONE
+* Bukti pendukung error lagi ----- DONE
+* Tinjau di ganti menjadi informasi di bawahnya saat di klik tinjau baru di bukti baru popup ----- DONE
+* Bukti di riwayat penghapusan masih error ---- DONE
+* Cek tombol yang seharusnya di tempatnya (data aktif, tidak aktif) ----- DONE
+* Styling Halaman Form Tambah & Edit Pengguna ----- DONE
+* Notifikasi berhasil/gagal/ yang lain masih kuno ----- DONE
+* Login page ----- DONE
+
+
 
 -Buat Fitur Laporan
+
+-Viewer masih bisa melakukan edit.
 
 -Buat ManajemenKategori.jsx
 Tampilkan daftar semua kategori dalam sebuah tabel.
 Buat fungsi "Edit" yang membuka modal/halaman baru untuk mengubah deskripsi.
 
--Styling Halaman Form Tambah & Edit Inventaris
 
--Styling Halaman Form Tambah & Edit Pengguna
-
--Bangun Halaman Dasbor Interaktif
-
-- Notifikasi berhasil/gagal/ yang lain masih kuno
 
 
 = Log aktivitas kurang lebih detail
 
 = Halaman log belum memiliki filter yang lengkap
 
-= Cek tombol yang seharusnya di tempatnya (data aktif, tidak aktif)
 
-=
 
 
 

@@ -1,144 +1,141 @@
+// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "../contexts/AuthContext";
+import Logo from "../assets/images/logo.JPG";
+import { Mail, Lock, Loader2 } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
   const { setUser, setToken } = useAuth();
 
-  // State untuk input form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // State untuk pesan error
   const [errors, setErrors] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setErrors(null);
-
-    const payload = {
-      email: email,
-      password: password,
-    };
+    setLoading(true);
 
     try {
-      // Kirim request ke API
-      const response = await axiosClient.post("/login", payload);
-
-      // Jika berhasil, panggil fungsi dari context
+      const response = await axiosClient.post("/login", { email, password });
       setUser(response.data.data.user);
       setToken(response.data.data.access_token);
-
-      setTimeout(() => {
-        // Arahkan ke halaman dashboard
-        navigate("/");
-      }, 1750);
+      setTimeout(() => navigate("/"), 1200);
     } catch (error) {
-      // Tangani error dari server
       const response = error.response;
       if (response && response.status === 422) {
-        // 422 Unprocessable Entity (Validation Error)
         setErrors(response.data.errors);
       } else {
-        // Handle error lain (misal: server down)
-        console.error("Login error:", error);
         setErrors({ general: ["Terjadi kesalahan pada server."] });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-        <div>
-          <h1 className="text-3xl font-bold text-center text-gray-900">
-            Sistem Inventaris Desa
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-200 via-blue-100 to-sky-200 overflow-hidden">
+      {/* Ornamen Bokeh Latar */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute w-72 h-72 bg-blue-400/30 rounded-full blur-3xl top-10 left-20 animate-pulse"></div>
+        <div className="absolute w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl bottom-10 right-20 animate-pulse"></div>
+      </div>
+
+      {/* Kartu Login */}
+      <div className="relative z-10 backdrop-blur-2xl bg-white/30 border border-white/40 shadow-2xl rounded-3xl p-10 w-full max-w-md animate-fadeUp">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-28 h-28 mb-4">
+            <img
+              src={Logo}
+              alt="Logo Desa Karangduren"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-800 text-center tracking-wide drop-shadow-sm">
+            Sistem Inventaris Desa Karangduren
           </h1>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Masuk untuk mengelola inventaris desa dengan mudah
+          <p className="text-sm text-slate-600 mt-1 text-center">
+            Kelola aset desa secara mudah, aman, dan efisien
           </p>
         </div>
 
-        {/* Tampilkan pesan error general jika ada */}
+        {/* Error */}
         {errors?.general && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <span className="block sm:inline">{errors.general[0]}</span>
+          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center mb-4">
+            {errors.general[0]}
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {/* Input Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Masukkan email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-              {/* Tampilkan error validasi email jika ada */}
-              {errors?.email && (
-                <p className="mt-2 text-sm text-red-600">{errors.email[0]}</p>
-              )}
-            </div>
-
-            {/* Input Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Masukkan password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-              {/* Tampilkan error validasi password jika ada */}
-              {errors?.password && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.password[0]}
-                </p>
-              )}
-            </div>
+        {/* Form Login */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email */}
+          <div className="relative">
+            <Mail
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+              size={18}
+            />
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/40 text-slate-800 placeholder-slate-500 border border-white/60 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
+            />
+            {errors?.email && (
+              <p className="text-xs text-red-600 mt-1">{errors.email[0]}</p>
+            )}
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Masuk
-            </button>
+          {/* Password */}
+          <div className="relative">
+            <Lock
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+              size={18}
+            />
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/40 text-slate-800 placeholder-slate-500 border border-white/60 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
+            />
+            {errors?.password && (
+              <p className="text-xs text-red-600 mt-1">{errors.password[0]}</p>
+            )}
           </div>
+
+          {/* Tombol Login */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="relative w-full py-3 font-semibold text-white text-sm rounded-xl overflow-hidden bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-700 shadow-md hover:shadow-blue-300/50 transition-all duration-300 group disabled:opacity-70"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={18} />
+                  <span>Memproses...</span>
+                </>
+              ) : (
+                "Masuk ke Sistem"
+              )}
+            </span>
+            <span className="absolute inset-0 bg-gradient-to-r from-indigo-400 via-blue-300 to-indigo-500 opacity-0 group-hover:opacity-25 blur-xl transition-all duration-700" />
+          </button>
         </form>
 
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Belum punya akun?{" "}
-          <a
-            href="/register"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Daftar di sini
-          </a>
+        {/* Footer Info */}
+        <p className="text-center text-xs text-slate-500 mt-6">
+          © 2025 Pemerintah Desa Karangduren
         </p>
       </div>
     </div>

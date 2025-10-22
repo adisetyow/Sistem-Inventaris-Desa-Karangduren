@@ -129,6 +129,11 @@ class Inventaris extends Model
         );
     }
 
+    public function getTotalNilaiAttribute()
+    {
+        return $this->jumlah * $this->harga_perolehan;
+    }
+
     public function penghapusanInventaris()
     {
         return $this->hasMany(PenghapusanInventaris::class, 'inventaris_id_lama');
@@ -180,16 +185,15 @@ class Inventaris extends Model
             return $query->where('lokasi_penempatan', 'like', '%' . $lokasi . '%');
         });
         $query->when($filters['priceRange'] ?? false, function ($query, $priceRange) {
-            // Memecah string "min-max" menjadi array [min, max]
             $range = explode('-', $priceRange);
-            $minPrice = $range[0];
-            $maxPrice = $range[1];
+            $minPrice = (int) $range[0];
+            $maxPrice = (int) $range[1];
 
-            // Menerapkan filter whereBetween ke kolom harga_perolehan
-            return $query->whereBetween('harga_perolehan', [$minPrice, $maxPrice]);
+            // Filter berdasarkan hasil perhitungan jumlah * harga_perolehan
+            return $query->whereRaw('(jumlah * harga_perolehan) BETWEEN ? AND ?', [$minPrice, $maxPrice]);
         });
-    }
 
+    }
     // Helper method untuk mendapatkan detail aset sesuai kategori
     public function getDetailAset()
     {

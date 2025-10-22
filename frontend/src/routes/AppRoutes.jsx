@@ -14,6 +14,7 @@ import UserManagement from "../pages/Users/UserManagement";
 import UserForm from "../pages/Users/UserForm";
 import PersetujuanHapus from "../pages/Pengelolaan/PersetujuanHapus";
 import LogAktivitas from "../pages/Pengelolaan/LogAktivitas";
+import LaporanInventaris from "../pages/Laporan/LaporanInventaris";
 
 const AppRoutes = () => {
   return (
@@ -49,9 +50,10 @@ const AppRoutes = () => {
         <Route path="inventaris/tambah" element={<InventarisForm />} />
         <Route path="inventaris/edit/:id" element={<InventarisForm />} />
         <Route path="inventaris/:id" element={<InventarisDetail />} />
-        <Route path="users" element={<UserManagement />} />
         <Route path="users/tambah" element={<UserForm />} />
         <Route path="users/edit/:id" element={<UserForm />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="/laporan/inventaris" element={<LaporanInventaris />} />
 
         <Route path="/pengelolaan/log-aktivitas" element={<LogAktivitas />} />
       </Route>

@@ -25,7 +25,7 @@ import {
 
 // Komponen Kartu Statistik dengan desain modern pastel
 const StatCard = ({ title, value, icon: Icon, format = (v) => v }) => (
-  <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-sm border border-blue-100/60 transition-all duration-300 hover:shadow-lg hover:border-blue-200 group">
+  <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-lg shadow-sm border border-blue-100/60 transition-all duration-300 hover:shadow-lg hover:border-blue-200 group">
     <div className="flex justify-between items-start">
       <div className="flex-1">
         <p className="text-sm font-medium text-slate-600 mb-2">{title}</p>
@@ -47,7 +47,7 @@ const StatCard = ({ title, value, icon: Icon, format = (v) => v }) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-blue-100">
+      <div className="bg-white/95 backdrop-blur-md px-4 py-3 rounded-lg shadow-xl border border-blue-100">
         <p className="text-sm font-semibold text-slate-700 mb-1">{label}</p>
         <p className="text-lg font-bold text-blue-600">
           {payload[0].value} unit
@@ -107,7 +107,7 @@ export default function Dashboard() {
   if (!stats)
     return (
       <div className="p-8 text-center">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 inline-block">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 inline-block">
           <p className="text-red-600 font-medium">Gagal memuat data dasbor.</p>
         </div>
       </div>
@@ -119,8 +119,8 @@ export default function Dashboard() {
     <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
       <div className="max-w-[1600px] mx-auto space-y-6 lg:space-y-8">
         {/* Header Section */}
-        <div className="max-w-7xl mx-auto bg-gradient-to-br from-blue-200 to-cyan-200  rounded-2xl shadow-md overflow-hidden mt-2 mb-6">
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="max-w-7xl mx-auto bg-gradient-to-br from-blue-200 to-cyan-200  rounded-lg shadow-md overflow-hidden mt-2 mb-6">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
               <h1 className="text-xl font-bold text-slate-700 tracking-tight">
                 Dashboard Inventaris
@@ -170,7 +170,7 @@ export default function Dashboard() {
         {/* Grafik Donut - Status & Kondisi */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Distribusi Status */}
-          <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
+          <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-lg shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
                 <TrendingUp
@@ -218,7 +218,7 @@ export default function Dashboard() {
           </div>
 
           {/* Distribusi Kondisi */}
-          <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
+          <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-lg shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
                 <TrendingUp
@@ -269,7 +269,7 @@ export default function Dashboard() {
         {/* Grafik Kategori & Aktivitas */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
           {/* Bar Chart Kategori */}
-          <div className="lg:col-span-3 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
+          <div className="lg:col-span-3 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-lg shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
                 <Activity
@@ -328,7 +328,7 @@ export default function Dashboard() {
           </div>
 
           {/* Log Aktivitas */}
-          <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
+          <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-lg shadow-sm border border-blue-100/50 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center border border-blue-100 shadow-sm group-hover:shadow-md transition-all duration-300">
                 <History
@@ -344,9 +344,9 @@ export default function Dashboard() {
               {aktivitasTerbaru.map((log) => (
                 <div
                   key={log.id}
-                  className="group flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 border border-blue-100/40 hover:shadow-md hover:border-blue-200/60 transition-all duration-300"
+                  className="group flex items-start gap-4 p-4 rounded-lg bg-gradient-to-br from-blue-50/50 to-indigo-50/30 border border-blue-100/40 hover:shadow-md hover:border-blue-200/60 transition-all duration-300"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-blue-100 shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-blue-100 shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     <History size={18} className="text-blue-500" />
                   </div>
                   <div className="flex-1 min-w-0">

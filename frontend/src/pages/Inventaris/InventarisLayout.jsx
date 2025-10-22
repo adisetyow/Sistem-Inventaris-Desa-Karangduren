@@ -14,6 +14,8 @@ import {
   Download,
 } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import toast from "react-hot-toast";
+import { useConfirmDialog } from "../../hooks/ConfirmDialog";
 
 const KondisiBadge = ({ kondisi }) => {
   const baseClasses =
@@ -180,9 +182,7 @@ export default function InventarisLayout({
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationInfo, setPaginationInfo] = useState(null);
-
   const [forceRefresh, setForceRefresh] = useState(false);
-
   const [filters, setFilters] = useState({
     kondisi: "",
     kategori_id: "",
@@ -190,6 +190,7 @@ export default function InventarisLayout({
   });
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [fileToView, setFileToView] = useState(null);
+  const { confirm, ConfirmDialog } = useConfirmDialog();
 
   useEffect(() => {
     const fetchInventaris = async () => {
@@ -230,37 +231,72 @@ export default function InventarisLayout({
     forceRefresh,
   ]);
 
-  const handleViewFile = (filePath) => {
+  const handleViewFile = async (filePath) => {
     if (!filePath) return;
     const fileName = filePath.split("/").pop();
-    const fileUrl = `${import.meta.env.VITE_API_URL}/storage/${filePath}`;
+    const isPdf = fileName.toLowerCase().endsWith(".pdf");
 
-    // Simpan juga path relatif untuk download
-    setFileToView({ url: fileUrl, name: fileName, path: filePath });
+    // Set state awal untuk menampilkan modal dengan status loading
+    setFileToView({
+      name: fileName,
+      path: filePath,
+      url: null,
+      loading: true,
+      isPdf: isPdf,
+    });
     setIsViewModalOpen(true);
+
+    try {
+      // Gunakan axios untuk mengambil file sebagai blob
+      const response = await axiosClient.get("/stream-file", {
+        params: { path: filePath },
+        responseType: "blob", // Penting!
+      });
+
+      let mimeType = "application/octet-stream";
+      if (isPdf) {
+        mimeType = "application/pdf";
+      } else if (fileName.toLowerCase().match(/\.(jpg|jpeg)$/)) {
+        mimeType = "image/jpeg";
+      } else if (fileName.toLowerCase().endsWith(".png")) {
+        mimeType = "image/png";
+      }
+
+      const blob = new Blob([response.data], { type: mimeType });
+      const blobUrl = window.URL.createObjectURL(blob);
+      setFileToView((prev) => ({ ...prev, url: blobUrl, loading: false }));
+    } catch (error) {
+      console.error("Error loading file:", error);
+      toast.error("Gagal memuat pratinjau file.");
+      setFileToView((prev) => ({ ...prev, loading: false, error: true }));
+    }
   };
 
-  const handleAktifkan = (itemId) => {
-    if (
-      !window.confirm(
-        `Apakah Anda yakin ingin mengaktifkan kembali aset dengan ID: ${itemId}?`
-      )
-    )
-      return;
+  const handleAktifkan = async (itemId) => {
+    const ok = await confirm({
+      title: "Aktifkan Aset?",
+      message: "Apakah Anda yakin ingin mengaktifkan kembali aset ini?",
+      confirmText: "Ya, Aktifkan",
+      cancelText: "Batal",
+    });
 
-    axiosClient
-      .post(`/inventaris/${itemId}/set-aktif`, {
-        alasan: "Aset diaktifkan kembali dari daftar aset tidak aktif.",
-      })
-      .then((response) => {
-        alert(response.data.message);
-        // Picu refresh data dengan mengubah state
+    if (!ok) return;
+
+    const promise = axiosClient.post(`/inventaris/${itemId}/set-aktif`, {
+      alasan: "Aset diaktifkan kembali.",
+    });
+
+    toast.promise(promise, {
+      loading: "Sedang mengaktifkan aset...",
+      success: (res) => {
         setForceRefresh((prev) => !prev);
-      })
-      .catch((error) => {
-        alert("Gagal mengaktifkan data.");
-        console.error(error);
-      });
+        return res.data.message || "Aset berhasil diaktifkan!";
+      },
+      error: (err) => {
+        console.error("Gagal mengaktifkan:", err);
+        return "Gagal mengaktifkan aset.";
+      },
+    });
   };
 
   const handleDownload = async (relativePath, filename) => {
@@ -270,7 +306,7 @@ export default function InventarisLayout({
         params: {
           path: relativePath,
         },
-        responseType: "blob", // SANGAT PENTING: Minta data sebagai file
+        responseType: "blob",
       });
 
       const blob = new Blob([response.data]);
@@ -310,6 +346,40 @@ export default function InventarisLayout({
     (v) => v !== ""
   ).length;
 
+  let tableHeaders = [];
+  if (statusFilter === "tidak_aktif") {
+    tableHeaders = [
+      { label: "No", style: { width: "60px" } },
+      { label: "Kode", style: { width: "140px" } },
+      { label: "Nama Barang", style: { minWidth: "160px", width: "22%" } },
+      { label: "Bukti", style: { width: "100px" } },
+      { label: "Keterangan", style: { minWidth: "200px", width: "25%" } },
+      { label: "Total Nilai", style: { width: "180px" } },
+      { label: "Aksi", style: { width: "100px" } },
+    ];
+  } else if (isHistoryPage) {
+    tableHeaders = [
+      { label: "No", style: { width: "60px" } },
+      { label: "Kode", style: { width: "140px" } },
+      { label: "Nama Barang", style: { minWidth: "180px", width: "25%" } },
+      { label: "Kategori", style: { width: "150px" } },
+      { label: "Tgl Dihapus", style: { width: "130px" } },
+      { label: "Total Nilai", style: { width: "160px" } },
+      { label: "Aksi", style: { width: "100px" } },
+    ];
+  } else {
+    // Halaman Aktif
+    tableHeaders = [
+      { label: "No", style: { width: "60px" } },
+      { label: "Kode", style: { width: "140px" } },
+      { label: "Nama Barang", style: { minWidth: "180px", width: "25%" } },
+      { label: "Kategori", style: { width: "150px" } },
+      { label: "Kondisi", style: { width: "120px" } },
+      { label: "Total Nilai", style: { width: "160px" } },
+      { label: "Aksi", style: { width: "100px" } },
+    ];
+  }
+
   return (
     <>
       <div className="bg-slate-50 min-h-screen p-2 md:p-4 lg:p-0">
@@ -322,7 +392,7 @@ export default function InventarisLayout({
               </h1>
               <p className="text-sm text-slate-500 mt-1">{description}</p>
             </div>
-            {!isHistoryPage && (
+            {statusFilter === "aktif" && (
               <Link to="/inventaris/tambah" className="w-full sm:w-auto">
                 <button className="px-3 py-2 text-sm font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm border border-blue-200">
                   <Plus className="w-4 h-4" />
@@ -427,234 +497,184 @@ export default function InventarisLayout({
             ) : (
               // Tabel Inventaris
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-100">
-                  <thead className="bg-sky-50 border-y border-blue-100">
-                    <tr>
-                      <th
-                        className="px-2 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                        style={{ width: "60px" }}
-                      >
-                        No.
-                      </th>
-                      <th
-                        className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                        style={{ width: "140px" }}
-                      >
-                        Kode
-                      </th>
-                      <th
-                        className="px-2 py-3 text-left text-xs font-bold text-slate-700 uppercase"
-                        style={{ minWidth: "200px", width: "5%" }}
-                      >
-                        Nama Barang
-                      </th>
-
-                      {statusFilter === "tidak_aktif" ? (
-                        <>
+                {loading ? (
+                  <div className="p-1">
+                    {" "}
+                    <TableLoader headers={tableHeaders} />
+                  </div>
+                ) : inventaris.length === 0 ? (
+                  <div className="text-center py-16 bg-slate-50">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-md">
+                      <Search className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <p className="text-slate-700 text-lg font-medium">
+                      Tidak ada data inventaris ditemukan
+                    </p>
+                    <p className="text-slate-500 text-sm mt-2">
+                      Coba ubah pencarian atau filter Anda.
+                    </p>
+                  </div>
+                ) : (
+                  // Tabel Inventaris
+                  <table className="min-w-full divide-y divide-slate-100">
+                    <thead className="bg-sky-50 border-y border-slate-100">
+                      <tr>
+                        {/* Membuat header tabel secara dinamis dari tableHeaders */}
+                        {tableHeaders.map((header, index) => (
                           <th
-                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                            style={{ width: "100px" }}
+                            key={index}
+                            className="px-2 py-3.5 text-left text-xs font-bold text-slate-600 uppercase whitespace-nowrap"
+                            style={header.style}
                           >
-                            Bukti
+                            {header.label}
                           </th>
-                          <th
-                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase"
-                            style={{ minWidth: "180px", width: "15%" }}
-                          >
-                            Keterangan
-                          </th>
-                        </>
-                      ) : isHistoryPage ? (
-                        <>
-                          {/* Lebar Kategori disamakan */}
-                          <th
-                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase"
-                            style={{ width: "150px" }}
-                          >
-                            Kategori
-                          </th>
-                          <th
-                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                            style={{ width: "140px" }}
-                          >
-                            Tgl Dihapus
-                          </th>
-                        </>
-                      ) : (
-                        <>
-                          {/* Lebar Kategori disamakan */}
-                          <th
-                            className="px-1 py-3 text-left text-xs font-bold text-slate-700 uppercase"
-                            style={{ width: "150px" }}
-                          >
-                            Kategori
-                          </th>
-                          {/* Lebar Kondisi ditambah agar tidak terpotong */}
-                          <th
-                            className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                            style={{ width: "170px" }}
-                          >
-                            Kondisi
-                          </th>
-                        </>
-                      )}
-
-                      {/* Lebar Total Nilai ditambah */}
-                      <th
-                        className="px-4 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                        style={{ width: "180px" }}
-                      >
-                        Total Nilai
-                      </th>
-                      <th
-                        className="px-3 py-3 text-left text-xs font-bold text-slate-700 uppercase whitespace-nowrap"
-                        style={{ width: "100px" }}
-                      >
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {inventaris.map((item, index) => (
-                      <tr
-                        key={item.id}
-                        className="hover:bg-slate-50/70 transition-colors duration-150"
-                      >
-                        <td className="px-2 py-3">
-                          <span className="text-sm font-medium text-slate-600">
-                            {paginationInfo.from + index}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="text-sm font-semibold text-blue-600 whitespace-nowrap">
-                            {item.kode_inventaris}
-                          </span>
-                        </td>
-                        <td className="px-2 py-3">
-                          <span
-                            className="text-sm font-medium text-slate-800 truncate max-w-[200px] block"
-                            title={item.nama_barang}
-                          >
-                            {item.nama_barang}
-                          </span>
-                        </td>
-
-                        {statusFilter === "tidak_aktif" ? (
-                          <>
-                            {/* Padding disamakan menjadi px-4 */}
-                            <td className="px-4 py-3">
-                              {item.log_status_terakhir?.file_pendukung_path ? (
-                                <button
-                                  onClick={() =>
-                                    handleViewFile(
-                                      item.log_status_terakhir
-                                        .file_pendukung_path
-                                    )
-                                  }
-                                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
-                                >
-                                  Lihat
-                                </button>
-                              ) : (
-                                <span className="text-sm text-slate-400">
-                                  -
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className="text-sm text-slate-600 truncate max-w-[180px] block"
-                                title={item.log_status_terakhir?.alasan}
-                              >
-                                {item.log_status_terakhir?.alasan || "-"}
-                              </span>
-                            </td>
-                          </>
-                        ) : isHistoryPage ? (
-                          <>
-                            {/* Padding disamakan menjadi px-4 */}
-                            <td className="px-4 py-3">
-                              <span className="text-sm truncate block">
-                                {item.kategori?.nama_kategori || "-"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="text-sm whitespace-nowrap">
-                                {new Date(item.deleted_at).toLocaleDateString(
-                                  "id-ID"
-                                )}
-                              </span>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            {/* Padding disamakan menjadi px-4 */}
-                            <td className="px-1 py-3">
-                              <span className="text-sm truncate block">
-                                {item.kategori?.nama_kategori || "-"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <KondisiBadge kondisi={item.kondisi} />
-                            </td>
-                          </>
-                        )}
-
-                        <td className="px-4 py-3">
-                          <span
-                            className="text-sm font-semibold text-slate-800 truncate block"
-                            title={new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                              minimumFractionDigits: 0,
-                            }).format(item.total_harga)}
-                          >
-                            {new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                              minimumFractionDigits: 0,
-                            }).format(item.total_harga)}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            {/* Tombol Detail */}
-                            <Link
-                              to={`/inventaris/${item.id}`}
-                              title="Detail"
-                              className="p-2 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 hover:bg-sky-100 hover:border-sky-200 hover:text-sky-700 shadow-sm transition-all duration-200"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Link>
-
-                            {/* Tombol Edit (hanya di halaman Aktif) */}
-                            {statusFilter === "aktif" && (
-                              <Link
-                                to={`/inventaris/edit/${item.id}`}
-                                title="Edit"
-                                className="p-2 rounded-lg bg-green-50 border border-green-100 text-green-600 hover:bg-green-100 hover:border-green-200 hover:text-green-700 shadow-sm transition-all duration-200"
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </Link>
-                            )}
-
-                            {/* Tombol Aktifkan (hanya di halaman Tidak Aktif) */}
-                            {statusFilter === "tidak_aktif" && (
-                              <button
-                                onClick={() => handleAktifkan(item.id)}
-                                title="Aktifkan Kembali"
-                                className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-200 hover:text-emerald-700 shadow-sm transition-all duration-200"
-                              >
-                                <RotateCcw className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {inventaris.map((item, index) => (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-slate-50/70 transition-colors duration-150"
+                        >
+                          <td className="px-4 py-3">
+                            <span className="text-sm font-medium text-slate-600">
+                              {paginationInfo.from + index}
+                            </span>
+                          </td>
+                          <td className="px-0 py-3">
+                            <span className="text-sm font-semibold text-blue-600 whitespace-nowrap">
+                              {item.kode_inventaris}
+                            </span>
+                          </td>
+                          <td className="px-2 py-3">
+                            <span
+                              className="text-sm font-medium text-slate-800 truncate max-w-[200px] block"
+                              title={item.nama_barang}
+                            >
+                              {item.nama_barang}
+                            </span>
+                          </td>
+
+                          {statusFilter === "tidak_aktif" ? (
+                            <>
+                              {/* Padding disamakan menjadi px-4 */}
+                              <td className="px-4 py-3">
+                                {item.log_status_terakhir
+                                  ?.file_pendukung_path ? (
+                                  <button
+                                    onClick={() =>
+                                      handleViewFile(
+                                        item.log_status_terakhir
+                                          .file_pendukung_path
+                                      )
+                                    }
+                                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                                  >
+                                    Lihat
+                                  </button>
+                                ) : (
+                                  <span className="text-sm text-slate-400">
+                                    -
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3">
+                                <span
+                                  className="text-sm text-slate-600 truncate max-w-[180px] block"
+                                  title={item.log_status_terakhir?.alasan}
+                                >
+                                  {item.log_status_terakhir?.alasan || "-"}
+                                </span>
+                              </td>
+                            </>
+                          ) : isHistoryPage ? (
+                            <>
+                              {/* Padding disamakan menjadi px-4 */}
+                              <td className="px-4 py-3">
+                                <span className="text-sm truncate block">
+                                  {item.kategori?.nama_kategori || "-"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="text-sm whitespace-nowrap">
+                                  {new Date(item.deleted_at).toLocaleDateString(
+                                    "id-ID"
+                                  )}
+                                </span>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              {/* Padding disamakan menjadi px-4 */}
+                              <td className="px-0 py-3">
+                                <span className="text-sm truncate block">
+                                  {item.kategori?.nama_kategori || "-"}
+                                </span>
+                              </td>
+                              <td className="px-0 py-3">
+                                <KondisiBadge kondisi={item.kondisi} />
+                              </td>
+                            </>
+                          )}
+
+                          <td className="px-0 py-3">
+                            <span
+                              className="text-sm font-semibold text-slate-800 truncate block"
+                              title={new Intl.NumberFormat("id-ID", {
+                                style: "currency",
+                                currency: "IDR",
+                                minimumFractionDigits: 0,
+                              }).format(item.total_harga)}
+                            >
+                              {new Intl.NumberFormat("id-ID", {
+                                style: "currency",
+                                currency: "IDR",
+                                minimumFractionDigits: 0,
+                              }).format(item.total_harga)}
+                            </span>
+                          </td>
+
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-2">
+                              {/* Tombol Detail */}
+                              <Link
+                                to={`/inventaris/${item.id}`}
+                                title="Detail"
+                                className="p-2 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 hover:bg-sky-100 hover:border-sky-200 hover:text-sky-700 shadow-sm transition-all duration-200"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Link>
+
+                              {/* Tombol Edit (hanya di halaman Aktif) */}
+                              {statusFilter === "aktif" && (
+                                <Link
+                                  to={`/inventaris/edit/${item.id}`}
+                                  title="Edit"
+                                  className="p-2 rounded-lg bg-green-50 border border-green-100 text-green-600 hover:bg-green-100 hover:border-green-200 hover:text-green-700 shadow-sm transition-all duration-200"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </Link>
+                              )}
+
+                              {/* Tombol Aktifkan (hanya di halaman Tidak Aktif) */}
+                              {statusFilter === "tidak_aktif" && (
+                                <button
+                                  onClick={() => handleAktifkan(item.id)}
+                                  title="Aktifkan Kembali"
+                                  className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-200 hover:text-emerald-700 shadow-sm transition-all duration-200"
+                                >
+                                  <RotateCcw className="w-4 h-4" />
+                                </button>
+                              )}
+                              <ConfirmDialog />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             )}
           </div>
@@ -673,32 +693,42 @@ export default function InventarisLayout({
           onClose={() => setIsViewModalOpen(false)}
           title="Lihat Bukti Pendukung"
         >
-          <div className="mt-4">
-            {fileToView.url.toLowerCase().endsWith(".pdf") ? (
-              <iframe
-                src={fileToView.url}
-                className="w-full h-[70vh] rounded-lg border"
-                title="PDF Viewer"
-              ></iframe>
-            ) : (
-              <img
-                src={fileToView.url}
-                alt="Bukti pendukung"
-                className="max-w-full max-h-[70vh] mx-auto rounded-lg"
-              />
-            )}
-          </div>
-          <div className="mt-6 flex justify-end">
-            {/* Tombol Download diubah menjadi <button> yang memanggil fungsi handleDownload */}
-            <button
-              // Panggil handleDownload dengan path relatif dan nama file
-              onClick={() => handleDownload(fileToView.path, fileToView.name)}
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm"
-            >
-              <Download className="w-4 h-4" />
-              Download
-            </button>
-          </div>
+          {fileToView && (
+            <>
+              <div className="mt-4 min-h-[300px] flex items-center justify-center">
+                {fileToView.loading && <p>Memuat pratinjau...</p>}
+                {fileToView.error && (
+                  <p className="text-red-500">Gagal memuat pratinjau.</p>
+                )}
+                {fileToView.url &&
+                  (fileToView.isPdf ? (
+                    <embed
+                      src={fileToView.url}
+                      type="application/pdf"
+                      className="w-full h-[70vh] rounded-lg border"
+                    />
+                  ) : (
+                    <img
+                      src={fileToView.url}
+                      alt="Bukti pendukung"
+                      className="max-w-full max-h-[70vh] mx-auto rounded-lg"
+                    />
+                  ))}
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() =>
+                    handleDownload(fileToView.path, fileToView.name)
+                  }
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </div>
+            </>
+          )}
         </Modal>
       )}
     </>
