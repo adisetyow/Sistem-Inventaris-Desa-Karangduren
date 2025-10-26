@@ -31,8 +31,22 @@ class BaseInventarisRequest extends FormRequest
             'jumlah' => 'required|integer|min:1',
             'kondisi' => 'required|in:Baik,Rusak Ringan,Rusak Berat',
             'lokasi_penempatan' => 'required|string|max:255',
-            'tanggal_masuk' => 'required|date',
-            'sumber_dana' => 'required|string|max:255',
+            'tanggal_masuk' => 'nullable|date',
+            'sumber_dana' => [
+                'required',
+                'string',
+                Rule::in([
+                    'DD',
+                    'ADD',
+                    'BHPD',
+                    'BHRD',
+                    'PAD',
+                    'Bantuan Kabupaten',
+                    'Bantuan Provinsi',
+                    'Bantuan Pusat',
+                    'Lainnya'
+                ])
+            ],
             'harga_perolehan' => 'required|numeric|min:0',
             'catatan' => 'nullable|string|max:1000',
         ];
@@ -61,7 +75,7 @@ class BaseInventarisRequest extends FormRequest
             'lokasi_penempatan.required' => 'Lokasi penempatan wajib diisi',
             'lokasi_penempatan.max' => 'Lokasi penempatan tidak boleh lebih dari 255 karakter',
 
-            'tanggal_masuk.required' => 'Tanggal masuk wajib diisi',
+
             'tanggal_masuk.date' => 'Format tanggal tidak valid',
 
             'sumber_dana.required' => 'Sumber dana wajib diisi',

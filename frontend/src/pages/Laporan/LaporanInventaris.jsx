@@ -54,7 +54,7 @@ const KOLOM_TERSEDIA = [
   { key: "kondisi", label: "Kondisi" },
   { key: "status", label: "Status" },
   { key: "lokasi_penempatan", label: "Lokasi" },
-  { key: "tanggal_masuk", label: "Tgl Masuk" },
+  // { key: "tanggal_masuk", label: "Tgl Masuk" },
   { key: "sumber_dana", label: "Sumber Dana" },
   { key: "harga_perolehan", label: "Harga Satuan" },
   { key: "total_harga", label: "Total Nilai" },

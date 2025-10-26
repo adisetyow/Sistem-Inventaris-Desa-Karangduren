@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->enum('kondisi', ['Baik', 'Rusak Ringan', 'Rusak Berat']);
             $table->string('status')->default('aktif')->after('kondisi');
             $table->string('lokasi_penempatan');
-            $table->date('tanggal_masuk');
+            $table->date('tanggal_masuk')->nullable();
             $table->string('sumber_dana');
             $table->decimal('harga_perolehan', 15, 2)->default(0);
             $table->text('catatan')->nullable();

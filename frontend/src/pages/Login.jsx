@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "../contexts/AuthContext";
-import Logo from "../assets/images/logo.JPG";
+import Logo from "../assets/images/LOGO.PNG";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
 export default function Login() {

@@ -160,7 +160,7 @@ export default function InventarisForm() {
     jumlah: "",
     kondisi: "Baik",
     lokasi_penempatan: "",
-    tanggal_masuk: new Date().toISOString().slice(0, 10),
+    tanggal_masuk: "",
     sumber_dana: "",
     harga_perolehan: "",
     catatan: "",
@@ -457,7 +457,7 @@ export default function InventarisForm() {
             label="Tanggal Masuk"
             name="tanggal_masuk"
             error={errors?.tanggal_masuk}
-            required
+            // required
             info="Tanggal aset diterima dan dicatat"
           >
             <Input
@@ -469,7 +469,7 @@ export default function InventarisForm() {
                   : ""
               }
               onChange={handleChange}
-              required
+              // required
               icon={Calendar}
             />
           </FormField>
@@ -482,15 +482,24 @@ export default function InventarisForm() {
             required
             info="Asal pendanaan untuk pembelian aset"
           >
-            <Input
-              type="text"
+            <Select // <-- Ganti dari Input ke Select
               name="sumber_dana"
               value={formData.sumber_dana || ""}
               onChange={handleChange}
               required
-              placeholder="Contoh: APBN, Hibah, Dana BOS"
-              icon={Banknote}
-            />
+              icon={Banknote} // Icon bisa tetap
+            >
+              <option value="">-- Pilih Sumber Dana --</option>
+              <option value="DD">DD</option>
+              <option value="ADD">ADD</option>
+              <option value="BHPD">BHPD</option>
+              <option value="BHRD">BHRD</option>
+              <option value="PAD">PAD</option>
+              <option value="Bantuan Kabupaten">Bantuan Kabupaten</option>
+              <option value="Bantuan Provinsi">Bantuan Provinsi</option>
+              <option value="Bantuan Pusat">Bantuan Pusat</option>
+              <option value="Lainnya">Lainnya</option>
+            </Select>
           </FormField>
 
           {/* Harga Satuan */}
@@ -563,7 +572,7 @@ export default function InventarisForm() {
                 label={field.label}
                 name={field.name}
                 error={errors && errors[field.name]}
-                required={field.required}
+                // required={field.required}
                 info={`Masukkan ${field.label.toLowerCase()} aset`}
               >
                 <Input
@@ -571,7 +580,7 @@ export default function InventarisForm() {
                   name={field.name}
                   value={formData[field.name] || ""}
                   onChange={handleChange}
-                  required={field.required}
+                  // required={field.required}
                   step={field.step || undefined}
                   placeholder={`Masukkan ${field.label.toLowerCase()}`}
                 />

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axiosClient from "../../api/axiosClient";
-import Logo from "../../assets/images/logo.JPG";
+import Logo from "../../assets/images/LOGO.PNG";
 import { useState, useEffect } from "react";
 import { History, LineChart } from "lucide-react";
 
